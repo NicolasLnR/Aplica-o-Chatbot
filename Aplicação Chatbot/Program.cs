@@ -60,7 +60,7 @@ namespace SimpleChatbot
 
     public class OpenAIConfig
     {
-        public const string ApiKey = "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"; // Substitua pela sua chave
+        public const string ApiKey = ""; // Substitua pela sua chave
         public const string Endpoint = "https://api.openai.com/v1/chat/completions";
     }
 
