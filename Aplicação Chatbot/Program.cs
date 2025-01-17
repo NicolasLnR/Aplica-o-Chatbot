@@ -27,7 +27,7 @@ namespace SimpleChatbot
                 string input = Console.ReadLine()?.ToLower(); // Converte a entrada para minúsculas
 
                 // Verifica se o usuário quer encerrar a conversa
-                if (input == "sair")
+                if (input == "sair") //tesste
                 {
                     Console.WriteLine("\nChatbot: Obrigado por usar nosso atendimento. Até mais!");
                     break;
