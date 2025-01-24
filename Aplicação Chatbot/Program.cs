@@ -11,19 +11,24 @@ namespace SimpleChatbot
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
+        // Histórico de mensagens
+        private List<dynamic> mensagens = new List<dynamic>
+        {
+            new { role = "system", content = "Você é um assistente útil." }
+        };
+
         public async Task<string> EnviarMensagem(string mensagem)
         {
             try
             {
+                // Adiciona a mensagem do usuário ao histórico
+                mensagens.Add(new { role = "user", content = mensagem });
+
                 // Criar o payload da requisição
                 var requestData = new
                 {
                     model = "gpt-3.5-turbo", // Modelo utilizado
-                    messages = new[]
-                    {
-                        new { role = "system", content = "Você é um assistente útil." },
-                        new { role = "user", content = mensagem }
-                    },
+                    messages = mensagens,
                     max_tokens = 100, // Limite de palavras na resposta
                     temperature = 0.7 // Criatividade
                 };
@@ -43,8 +48,14 @@ namespace SimpleChatbot
                     var responseJson = await response.Content.ReadAsStringAsync();
                     dynamic responseObject = JsonConvert.DeserializeObject(responseJson);
 
-                    // Retornar a resposta da API
-                    return responseObject.choices[0].message.content.ToString();
+                    // Captura a resposta da API
+                    string resposta = responseObject.choices[0].message.content.ToString();
+
+                    // Adiciona a resposta ao histórico
+                    mensagens.Add(new { role = "assistant", content = resposta });
+
+                    // Retorna a resposta
+                    return resposta.Trim();
                 }
                 else
                 {
@@ -72,7 +83,7 @@ namespace SimpleChatbot
             Console.WriteLine("Bem-vindo ao Chatbot de Atendimento!");
             Console.WriteLine("Digite sua pergunta ou digite 'sair' para encerrar.\n");
 
-            // Dicionário com perguntas e respostas
+            // Dicionário com perguntas e respostas pré-definidas
             Dictionary<string, string> faq = new Dictionary<string, string>
             {
                 { "qual seu nome", "Sou o Chatbot de Atendimento." },
@@ -111,6 +122,7 @@ namespace SimpleChatbot
                 // Caso nenhuma resposta do dicionário seja encontrada, utilize o ChatGPT
                 if (!respostaEncontrada)
                 {
+                    Console.WriteLine("Chatbot: Estou pensando..."); // Mensagem de espera
                     var resposta = await chatClient.EnviarMensagem(input); // Utilize await para chamadas assíncronas
                     Console.WriteLine($"Chatbot: {resposta}");
                 }
